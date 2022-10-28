@@ -7,6 +7,6 @@ public class Funcionario
     public string Cpf { get; set; }
     public DateTime CriadoEm { get; set; }
 
-    //public ICollection<Folha> Folhas { get; set; }
+    public ICollection<Folha> Folhas { get; set; }
     
 }

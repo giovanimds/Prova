@@ -1,9 +1,13 @@
+using System.Text.Json.Serialization;
 using WebAppProva.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddJsonOptions(o =>
+{
+    o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
 builder.Services.AddSqlite<DataContext>("Data Source=database.db");
 var app = builder.Build();
 
@@ -18,7 +22,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(

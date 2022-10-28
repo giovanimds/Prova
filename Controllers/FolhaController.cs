@@ -29,58 +29,22 @@ public class FolhaController : Controller
             folha.SalarioBruto = folha.ValorHora * folha.QuantidadeDeHoras;
             folha.ImpostoFgts = folha.SalarioBruto * 0.08;
 
-            if (folha.SalarioBruto > 4664.68)
+            folha.ImpostoDeRenda = folha.SalarioBruto switch
             {
-                folha.ImpostoDeRenda = folha.SalarioBruto * 0.275;
-            }
-            else
-            {
-                if (folha.SalarioBruto > 3751.06)
-                {
-                    folha.ImpostoDeRenda = folha.SalarioBruto * 0.225;
-                }
-                else
-                {
-                    if (folha.SalarioBruto > 2826.66)
-                    {
-                        folha.ImpostoDeRenda = folha.SalarioBruto * 0.15;
-                    }
-                    else
-                    {
-                        if (folha.SalarioBruto > 1903.99)
-                        {
-                            folha.ImpostoDeRenda = folha.SalarioBruto * 0.075;
-                        }
-                        else
-                        {
-                            folha.ImpostoDeRenda = 0;
-                        }
-                    }
-                }
-            }
+                > 4664.68 => folha.SalarioBruto * 0.275,
+                > 3751.06 => folha.SalarioBruto * 0.225,
+                > 2826.66 => folha.SalarioBruto * 0.15,
+                > 1903.99 => folha.SalarioBruto * 0.075,
+                _ => 0
+            };
 
-            if (folha.SalarioBruto > 5645.81)
+            folha.ImpostoInss = folha.SalarioBruto switch
             {
-                folha.ImpostoInss = 621.03;
-            }
-            else
-            {
-                if (folha.SalarioBruto > 2822.91)
-                {
-                    folha.ImpostoInss = folha.SalarioBruto * 0.11;
-                }
-                else
-                {
-                    if (folha.SalarioBruto > 1693.73)
-                    {
-                        folha.ImpostoInss = folha.SalarioBruto * 0.09;
-                    }
-                    else
-                    {
-                        folha.ImpostoInss = folha.SalarioBruto * 0.08;
-                    }
-                }
-            }
+                > 5645.81 => 621.03,
+                > 2822.91 => folha.SalarioBruto * 0.11,
+                > 1693.73 => folha.SalarioBruto * 0.09,
+                _ => folha.SalarioBruto * 0.08
+            };
 
             folha.SalarioLiquido = folha.SalarioBruto - (folha.ImpostoInss + folha.ImpostoDeRenda);
             folha.Data = DateTime.Today;
@@ -91,7 +55,7 @@ public class FolhaController : Controller
         {
             return BadRequest(e.Message);
         }
-        return Ok(JsonSerializer.Serialize(folha));
+        return Ok(folha);
     }
 
     [HttpGet]
@@ -104,7 +68,7 @@ public class FolhaController : Controller
             foreach (var folha in _ctx.Folhas.Include(x => x.Funcionario).ToList())
             {
                 if (folha.Funcionario.Cpf.Equals(cpf) && folha.Data.Month == mes && folha.Data.Year == ano)
-                    return Ok(JsonSerializer.Serialize(folha));
+                    return Ok(folha);
             }
         }
         catch (Exception e)
@@ -133,6 +97,6 @@ public class FolhaController : Controller
     public IActionResult Listar()
     {
         List<Folha> folhas = _ctx.Folhas.Include(x => x.Funcionario).ToList();
-        return Ok(JsonSerializer.Serialize(folhas));
+        return Ok(folhas);
     }
 }
